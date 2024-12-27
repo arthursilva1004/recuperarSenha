@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha</title>
+    <link rel="stylesheet" href="redefinir-senha.css">
+</head>
+<body>
+    
+    <form id="resetPasswordForm">
+        <h1>Redefinir Senha</h1>
+        <input type="hidden" id="token" value="">
+        <label for="novaSenha">Nova Senha:</label>
+        <input type="password" id="novaSenha" placeholder="Digite sua nova senha">
+        <label for="confirmarSenha">Confirmar Senha:</label>
+        <input type="password" id="confirmarSenha" placeholder="Confirme sua nova senha">
+        <button type="button" onclick="redefinirSenha()">Redefinir</button>
+    </form>
+
+    <script>
+        async function redefinirSenha() {
+            const token = new URLSearchParams(window.location.search).get('token');
+            const novaSenha = document.getElementById("novaSenha").value.trim();
+            const confirmarSenha = document.getElementById("confirmarSenha").value.trim();
+
+            if (!novaSenha || !confirmarSenha) {
+                alert("Preencha todos os campos.");
+                return;
+            }
+
+            if (novaSenha !== confirmarSenha) {
+                alert("As senhas não coincidem.");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/redefinir-senha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, novaSenha }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Senha redefinida com sucesso!");
+                    window.location.href = "index.html";
+                } else {
+                    alert(result.error || "Erro ao redefinir a senha.");
+                }
+            } catch (error) {
+                console.error("Erro ao conectar com o servidor:", error);
+                alert("Erro ao conectar com o servidor.");
+            }
+        }
+    </script>
+</body>
+</html>
